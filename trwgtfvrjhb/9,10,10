@@ -1,0 +1,42 @@
+Disabling X forwarding, DISPLAY not set
+Job <4702093> is submitted to queue <pdebug>.
+<<Waiting for JSM to become ready ...>>
+<<Redirecting to compute node lassen26, setting up as private launch node>>
+Warning: Overriding mvapich2/2021.05.28-cuda-10.1.243 for gcc-8.3.1 (module loaded must exactly match)
+Warning: Using      mvapich2/2021.05.28-cuda-11.1.1 for gcc-8.3.1 to match app's MPI
+Please tell John Gyllenhaal (gyllen@llnl.gov, 4-5485) if this MPI env fix doesn't work
+360  0.000003
+ 360  0.000003
+ 720  0.000003
+ 720  0.000003
+ 1440  0.000003
+ 1440  0.000003
+ 2880  0.000003
+ 2880  0.000003
+ 5760  0.000021
+ 5760  0.000021
+ 11520  0.000017
+ 11520  0.000017
+ 23040  0.000015
+ 23040  0.000015
+ 46080  0.000016
+ 46080  0.000016
+ 92160  0.000019
+ 92160  0.000019
+ 184320  0.000024
+ 184320  0.000024
+ 368640  0.000034
+ 368640  0.000034
+ 737280  0.000049
+ 737280  0.000049
+ 1474560  0.000081
+ 1474560  0.000081
+ 2949120  0.000188
+ 2949120  0.000188
+ 5898240  0.000321
+ 5898240  0.000321
+ 11796480  0.000635
+ 11796480  0.000635
+ 23592960  0.001152
+ 23592960  0.001152
+ User defined signal 2

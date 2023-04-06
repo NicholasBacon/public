@@ -1,0 +1,43 @@
+Disabling X forwarding, DISPLAY not set
+Job <4703201> is submitted to queue <pdebug>.
+<<Waiting for JSM to become ready ...>>
+<<Redirecting to compute node lassen29, setting up as private launch node>>
+Warning: Overriding spectrum-mpi/rolling-release (module loaded must exactly match)
+Warning: Using      mvapich2/2021.05.28-cuda-11.1.1 for gcc-8.3.1 to match app's MPI
+Please tell John Gyllenhaal (gyllen@llnl.gov, 4-5485) if this MPI env fix doesn't work
+200  0.000002
+ 200  0.000002
+ 400  0.000003
+ 400  0.000003
+ 800  0.000003
+ 800  0.000003
+ 1600  0.000003
+ 1600  0.000003
+ 3200  0.000004
+ 3200  0.000004
+ 6400  0.000022
+ 6400  0.000022
+ 12800  0.000013
+ 12800  0.000013
+ 25600  0.000014
+ 25600  0.000014
+ 51200  0.000016
+ 51200  0.000016
+ 102400  0.000019
+ 102400  0.000019
+ 204800  0.000025
+ 204800  0.000025
+ 409600  0.000035
+ 409600  0.000035
+ 819200  0.000052
+ 819200  0.000052
+ 1638400  0.000088
+ 1638400  0.000088
+ 3276800  0.000209
+ 3276800  0.000209
+ 6553600  0.000356
+ 6553600  0.000356
+ 13107200  0.000688
+ 13107200  0.000688
+ 26214400  0.001387
+ 
