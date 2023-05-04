@@ -1,0 +1,15 @@
+spack:
+  specs:
+
+  # For the things that are cuda-dependent, we matrix the compiler so we can
+  # force exactly the compiler we want.
+  - matrix:
+    - - cuda@11.6.2
+      - ucx +ib_hw_tm +gdrcopy +cuda
+      - mpich@4.0.2 +cuda device=ch4 datatype-engine=dataloop cuda_arch=80  netmod=ucx
+    - ['%gcc@11.2.0']
+  - cmake
+  concretizer:
+    unify: true
+  view: true
+
