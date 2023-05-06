@@ -105,39 +105,13 @@ def makgraphs(pingpong,logGP,rang,PLOT,ERR0R):
 
 
             if PLOT == Graphs.oGraphs:
-                # plt.plot(np.array(xs),
-                #           o_r,
-                #          '-', label='loggp', markersize=3, color='green')
-                #
-                # plt.plot(np.array(xs),
-                #           o_s,
-                #          '-', label='loggp', markersize=3, color='green')
-                # draw lines
-                xmin = 1
-                xmax = 9
-                y = 5
-                height = 1
 
-                # plt.hlines(y, xmin, xmax)
-                # plt.vlines(xmin, y - height / 2., y + height / 2.)
-                # plt.vlines(xmax, y - height / 2., y + height / 2.)
-
-                # draw a point on the line
-                px = 4
-                print(np.array(list(filter(lambda x: x == x, map(lambda x: logGP[keys][x]['g'], xs)))))
-                plt.plot(  np.array(list(filter(lambda x: logGP[keys][x]['g'] == logGP[keys][x]['g'],  xs))),  (np.array(list(filter(lambda x: x == x, map(lambda x: logGP[keys][x]['g'], xs)))))  , 'ro', ms=15, mfc='r')
-
-                # add an arrow
-                # plt.annotate('Price five days ago', (px, y), xytext=(px - 1, y + 1),
-                #              arrowprops=dict(facecolor='black', shrink=0.1),
-                #              horizontalalignment='right')
+                plt.plot(  np.array(list(filter(lambda x: logGP[keys][x]['o_s'] == logGP[keys][x]['o_s'],  xs))),  (np.array(list(filter(lambda x: x == x, map(lambda x: logGP[keys][x]['o_s'], xs)))))  , 'ro', ms=2, mfc='r')
+                plt.plot(  np.array(list(filter(lambda x: logGP[keys][x]['o_r'] == logGP[keys][x]['o_r'],  xs))),  (np.array(list(filter(lambda x: x == x, map(lambda x: logGP[keys][x]['o_r'], xs)))))  , 'ro', ms=3, mfc='b')
 
 
 
             if PLOT == Graphs.TimePlot:
-                # plt.plot(np.array(xs),np.array(xs)*a+b, '-', label=keys, markersize=3, color='blue')
-
-
                 plt.plot(np.array(xs),np.array(ys), '-.', label='real', markersize=3, color='red')
                 plt.plot(np.array(xs),  loggpPingPong(np.array(xs), L,
                                                       (np.array(xs) * o_r) , (
@@ -165,7 +139,6 @@ def makgraphs(pingpong,logGP,rang,PLOT,ERR0R):
                              )
 
                 elif   ERR0R== Graphs.nonabsERR0R:
-                    print(a,o_r,a-o_r)
                     plt.plot(np.array(xs),
                              100 * (np.array(ys)   - loggpPingPong(np.array(xs), L,
                                                                    (np.array(xs) * o_r), (
@@ -196,28 +169,29 @@ def makeGraph(folder_path, logy, logx ,listofranges,graphtype,errortype,allnewpl
     if logx:
         plt.xscale('log', base=2)
     if allnewplots:
-        plt.title("graph of  prodected times and ping pong of " + folder_path.split("\\")[-1] + "")
+        if graphtype ==Graphs.ErrorPlot:
+            plt.title("graph of  Errors of predicted times vs measured " + folder_path.split("\\")[-1] + "")
+            plt.ylabel("times (seconds)")
+            plt.xlabel("Bytes")
+        if graphtype == Graphs.TimePlot:
+            plt.title("graph of   predicted times vs measured " + folder_path.split("\\")[-1] + "")
+            plt.ylabel("times (seconds)")
+            plt.xlabel("Bytes")
 
-        plt.xlabel("Bytes")
 
-        plt.ylabel("times seconds")
+
+
     # plt.legend()
 
         plt.show()
 
 folder_path = 'runs\\mpich'
-allnewplots = False
+allnewplots = True
 # makeGraph('runs\\mpich', False, True ,[range(2**0,2**8+1)], Graphs.oGraphs,Graphs.nonabsERR0R,allnewplots)
 # makeGraph('runs\\mvap2', False, True ,[range(2**0,2**8+1)], Graphs.oGraphs,Graphs.nonabsERR0R,allnewplots)
 makeGraph('runs\\spec++', False, True ,[range(2**0,2**8+1)],Graphs.oGraphs,Graphs.nonabsERR0R,allnewplots)
 makeGraph('runs\\open', False, True ,[range(2**0,2**8+1)],  Graphs.oGraphs,Graphs.nonabsERR0R,allnewplots)
-if not allnewplots:
-    plt.title("graph of  prodected times and ping pong of " + folder_path.split("\\")[-1] + "")
 
-    plt.xlabel("Bhytes")
-
-    plt.ylabel("times sehconds")
-    plt.show()
 # makgraphs(pingpong, logGP, range(2**0,2**8+1) ,Graphs.ErrorPlot,Graphs.nonabsERR0R)
 
 # makgraphs(pingpong, logGP, range(2**0,2**19) ,Graphs.ErrorPlot,Graphs.absERR0R)
