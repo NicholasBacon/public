@@ -23,7 +23,11 @@ def loggpPingPong(k, L, o, g, G, P):
     return (2 * o + (P - 1) * (L + (k / 2 - 1) * G) + (P - 2) * (g + o)) / 1e6
 def loggpPingPong(k, L, o_s,o_r,  g, G, P):
     # return (o+(k-1)*G+(P-2)*(L+o+g+(k-1)*G)+L+o)
-    return (o_s+o_r + (L + (k/2 - 1) * G) ) / 1e6*2+g/1e6
+    return (o_s+o_r + (L + (k - 1) * G) ) / 1e6*2+g/1e6
+
+# def loggpPingPong(k, L, o_s,o_r,  g, G, P):
+#     # return (o+(k-1)*G+(P-2)*(L+o+g+(k-1)*G)+L+o)
+#     return (o_s+o_r + (L + (k/2 - 1) * G) ) / 1e6*2+g/1e6
 
 # def loggpPingPong(k, L, o_s,o_r,  g, G, P):
 # #     # return (o+(k-1)*G+(P-2)*(L+o+g+(k-1)*G)+L+o)
