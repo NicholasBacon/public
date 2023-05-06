@@ -13,7 +13,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # MPI
 find_package(MPI REQUIRED)
-find_package(Kokkos 3 REQUIRED)
+find_package(CUDAToolkit REQUIRED)
+#find_package(Kokkos 3 REQUIRED)
 
 if (ENABLE_TEMPI)
     set(TEMPI_ENABLE_KAHIP OFF)
@@ -34,8 +35,9 @@ if (ENABLE_WRAP)
 endif(ENABLE_WRAP)
 
 add_executable(ping_pong src/Main.cpp)
-target_link_libraries(ping_pong PUBLIC Kokkos::kokkos)
+#target_link_libraries(ping_pong PUBLIC Kokkos::kokkos)
 target_link_libraries(ping_pong PUBLIC MPI::MPI_CXX)
+target_link_libraries(ping_pong PUBLIC CUDA::cudart)
 
 #set_target_properties(ping_pong PROPERTIES CUDA_ARCHITECTURES "80")
 if (ENABLE_TEMPI)

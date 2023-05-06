@@ -7,14 +7,12 @@
 #include <math.h>
 
 
-#include "cuda.h"
 #include <list>
 #include <cstring>    /* memset & co. */
 #include <ctime>
 #include <cassert>
-//#include <cuda.h>
+#include <cuda.h>
 #include <cuda_runtime.h>
-//#include "Kokkos_Core.hpp"
 #include <fstream>
 #include <iomanip>
 #include <ostream>
@@ -22,27 +20,36 @@
 #include <iostream>
 #include <numeric>
 
-
-
-
- int n = 10;
 #include<unistd.h>
-int start =1;
+
+
+int n = 10;
+int startbytes =1;
+int endbytes = 150000;
+
 bool server = false;
-int testcount = 5;
-int NG_START_PACKET_SIZE = 1028;
-int max_datasize = 10000000 * 2;
-int maxbufersize = 100000000;
+int testcount = 100;
+//int NG_START_PACKET_SIZE = 1028;
+//int max_datasize = 10000000 * 2;
+int maxbuffercount = 100000000; // 100M floats
 
 
 bool selfPack;
 MPI_Datatype datatype = MPI_FLOAT;
-float *d_data1;
-float *h_data;
 int total_size;
 
 int rank, num_procs;
 
+/* From stackoverflow */
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess) 
+   {
+      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      if (abort) exit(code);
+   }
+}
 
 template<typename T>
 T variance(const std::list<T> &vec) {
@@ -70,8 +77,6 @@ void pingpong(void *buffer , int i) {
 //retal error.
     MPI_Type_size(datatype, &size_s);
 
-
-
     for (int j = 0; j < testcount; ++j) {
         if (rank == 0) {
             MPI_Send(buffer, i
@@ -86,11 +91,6 @@ void pingpong(void *buffer , int i) {
     }
 
 
-    fflush(stdout);
-
-    int x = 3;
-
-
         for (int j = 0; j < 10; ++j) {
             if (rank == 0) {
                 MPI_Send(buffer, i, datatype, 1, 0, MPI_COMM_WORLD);
@@ -102,9 +102,9 @@ void pingpong(void *buffer , int i) {
             }
         }
 
-
         std::list<double> times0, times1;
 
+    int x = 3;
 
         for (int k = 0; k < 10; ++k) {
 
@@ -194,6 +194,8 @@ void pingpong(void *buffer , int i) {
 
 
 }
+
+#if 0
 void pingpong(void *buffer) {
 
     MPI_Status status;
@@ -325,24 +327,25 @@ void pingpong(void *buffer) {
     }
 
 }
+#endif
 
-
-static void *mpi_cuda_malloc(size_t size) {
-
-    cudaMalloc((void **) &d_data1, size * sizeof(float));
+static void *mpi_cuda_malloc(size_t count) {
+    void *d_data1;
+    cudaMalloc((void **) &d_data1, count * sizeof(float));
 //    cudaMalloc((void **) &d_data0, data_size * sizeof(float));
 
-    h_data = (float *) malloc(size * sizeof(float));
+    float *h_data = (float *) malloc(count * sizeof(float));
 
-
-    for (int i = 0; i < size; ++i) {
+    for (int i = 0; i < count; ++i) {
         h_data[i] = i * 1.0f;
     }
 //    cudaMemcpy(h_data, d_data0, data_size * sizeof(float), cudaMemcpyDeviceToHost);
     printf("%p\n",d_data1);
     fflush(stdout);
 
-    cudaMemcpy(h_data, d_data1, size * sizeof(float), cudaMemcpyDeviceToHost);
+    // Copy initialized host data to GPU buffer.
+    gpuErrchk(cudaMemcpy(d_data1, h_data, count * sizeof(float), cudaMemcpyHostToDevice));
+    free(h_data);
     return d_data1;
 }
 
@@ -748,7 +751,7 @@ int loggp_do_benchmarks() {
     if (loggp_prepare_benchmarks()) return 1;
 
 
-    char *buffer = (char *) mpi_cuda_malloc(maxbufersize);
+    char *buffer = (char *) mpi_cuda_malloc(maxbuffercount);
 
     MPI_Type_size(datatype, &total_size);
 
@@ -759,10 +762,9 @@ int loggp_do_benchmarks() {
     results_o_r.constructor(&results_o_r, n, 0);
     gresults.constructor(&gresults, 1, 0);
 
-//    pingpong(buffer);
+    if (startbytes < total_size) startbytes = total_size;
 
-
-    for (int i =  start/total_size; i < 150000; i = i * 2) {
+    for (int i =  startbytes/total_size; i < endbytes/total_size; i = i * 2) {
         fflush(stdout);
         pingpong(buffer ,i);
         data_size = i * total_size;
@@ -1016,18 +1018,19 @@ std::vector<int> split(const std::string &s, char delim) {
 
 MPI_Datatype make_datatype(int argc, char *argv[]) {
 
-
+    int ret;
     MPI_Datatype oldType = MPI_FLOAT;
     std::vector<std::vector<int>> x;
 
-        std::vector<int> v = split(argv[1], ',');
-        x.insert(x.end(), v);
-        MPI_Datatype type;
-        MPI_Type_vector(v[0], v[1], v[2], oldType, &type);
-        oldType = type;
+    std::vector<int> v = split(argv[1], ',');
+    x.insert(x.end(), v);
+    MPI_Datatype type;
+    ret = MPI_Type_vector(v[0], v[1], v[2], oldType, &type);
+    assert(ret == MPI_SUCCESS);
+    ret = MPI_Type_commit(&type);
+    assert(ret == MPI_SUCCESS);
 
-
-    return oldType;
+    return type;
 }
 
 
@@ -1038,27 +1041,19 @@ int main(int argc, char *argv[]) {
 
 
 //    MPI_Type_vector(3, 2, 4, MPI_FLOAT, &datatype);
-        start= atoi(argv[2]);
-    printf(":%i\n",start);
+    if (argc > 2) 
+        startbytes= atoi(argv[2]);
+    if (argc > 3) 
+        endbytes= atoi(argv[3]);
+    printf("testing from %d bytes to %d bytes\n",startbytes, endbytes);
     fflush(stdout);
     datatype = make_datatype(argc, argv);
-
-
-    MPI_Type_commit(&datatype);
-//
-
-
-
 
     loggp_prepare_benchmarks();
 
     loggp_do_benchmarks();
 
-
     MPI_Finalize();
-
-
-
 
     printf("\n");
     return 0;
