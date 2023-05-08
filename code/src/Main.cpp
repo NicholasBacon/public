@@ -1047,8 +1047,13 @@ int main(int argc, char *argv[]) {
         endbytes= atoi(argv[3]);
     printf("testing from %d bytes to %d bytes\n",startbytes, endbytes);
     fflush(stdout);
-    datatype = make_datatype(argc, argv);
-
+    if (argc > 1) {
+     datatype = make_datatype(argc, argv);
+    }else{
+       datatype =MPI_FLOAT;
+    }
+       
+      
     loggp_prepare_benchmarks();
 
     loggp_do_benchmarks();
